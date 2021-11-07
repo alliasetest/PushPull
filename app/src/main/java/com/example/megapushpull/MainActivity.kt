@@ -2,15 +2,18 @@ package com.example.megapushpull
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import com.example.pushpullmega.R
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 
 class MainActivity : AppCompatActivity() {
     val db = Firebase.firestore
+    var arrayList:ArrayList<MyRecord> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -30,5 +33,27 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this,"failure",Toast.LENGTH_LONG).show()
                 }
         }
+
+        getData()
+    }
+
+    private fun getData(){
+        arrayList.clear()
+        db.collection("pushrepo")
+            .get()
+            .addOnCompleteListener {
+                if(it.isSuccessful){
+                    it.result?.forEachIndexed { index, item ->
+                        val list = MyRecord(fname = item.getString("fname").toString(),
+                            fage = item.getString("fage").toString(), fcity = item.getString("fcity").toString())
+                        arrayList.add(list)
+                    }
+                    arrayList.forEachIndexed{ index, myRecord ->
+                        Log.d("UserData", "fname: ${myRecord.fname}")
+                        Log.d("UserData", "fage: ${myRecord.fage}")
+                        Log.d("UserData", "fcity: ${myRecord.fcity}")
+                    }
+                }
+            }
     }
 }
